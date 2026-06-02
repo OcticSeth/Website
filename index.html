@@ -24,6 +24,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
+    transition: transform 0.3s ease;
   }
 
   .nav-logo {
@@ -439,6 +440,21 @@
 </div>
 
 <script>
+  // ── NAV HIDE/SHOW ON SCROLL ──
+  let lastScroll = 0;
+  window.addEventListener('scroll', () => {
+    const current = window.scrollY;
+    const nav = document.querySelector('nav');
+    if (current <= 10) {
+      nav.style.transform = 'translateY(0)';
+    } else if (current > lastScroll) {
+      nav.style.transform = 'translateY(-100%)';
+    } else {
+      nav.style.transform = 'translateY(0)';
+    }
+    lastScroll = current;
+  });
+
   // ── MENU ──
   let menuOpen = false;
   function toggleMenu() {
