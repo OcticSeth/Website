@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VAULT</title>
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="VAULT">
+<meta property="og:description" content="">
+<meta property="og:image" content="">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #000;
+    height: 100%;
+    width: 100%;
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ── BACKGROUND GRID ── */
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: 0;
+  }
+
+  .bg-glow {
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── VAULT CONTAINER ── */
+  .vault {
+    position: relative;
+    z-index: 10;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+
+  .vault.loaded { opacity: 1; }
+
+  /* ── HEADER ── */
+  .vault-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .vault-label {
+    font-size: 9px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    font-weight: 300;
+  }
+
+  .vault-title {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.12);
+    font-weight: 300;
+  }
+
+  /* ── GLASS PANEL ── */
+  .glass-panel {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(48px) saturate(180%);
+    -webkit-backdrop-filter: blur(48px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow:
+      0 0 0 0.5px rgba(255,255,255,0.04) inset,
+      0 2px 0 rgba(255,255,255,0.07) inset,
+      0 32px 80px rgba(0,0,0,0.8),
+      0 0 120px rgba(255,255,255,0.02);
+    border-radius: 28px;
+    padding: 36px 32px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    width: min(340px, 92vw);
+  }
+
+  /* ── DISPLAY ── */
+  .display-wrap {
+    width: 100%;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .display-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  }
+
+  .display-status {
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .display-code {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 32px;
+    letter-spacing: 0.15em;
+    color: #fff;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+  }
+
+  .display-code.error { color: #ff3b30; }
+  .display-code.success { color: #30d158; }
+
+  .digit {
+    display: inline-block;
+    width: 22px;
+    text-align: center;
+    position: relative;
+  }
+
+  .digit::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.15);
+  }
+
+  .cursor-blink {
+    display: inline-block;
+    width: 2px;
+    height: 28px;
+    background: rgba(255,255,255,0.6);
+    animation: blink 1s step-end infinite;
+    margin-left: 2px;
+    border-radius: 1px;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ── SHAKE ANIMATION ── */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    15% { transform: translateX(-8px); }
+    30% { transform: translateX(8px); }
+    45% { transform: translateX(-6px); }
+    60% { transform: translateX(6px); }
+    75% { transform: translateX(-3px); }
+    90% { transform: translateX(3px); }
+  }
+
+  .shake { animation: shake 0.5s ease; }
+
+  /* ── KEYPAD ── */
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+  }
+
+  .key {
+    aspect-ratio: 1;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.09);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.08) inset,
+      0 4px 12px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s, transform 0.1s, box-shadow 0.1s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .key::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.08), transparent 60%);
+    pointer-events: none;
+  }
+
+  .key:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .key:active, .key.pressed {
+    background: rgba(255,255,255,0.18);
+    transform: scale(0.94);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  }
+
+  .key-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 22px;
+    color: rgba(255,255,255,0.9);
+    line-height: 1;
+  }
+
+  .key-letters {
+    font-size: 7px;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.25);
+    margin-top: 3px;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  .key.key-del {
+    background: rgba(255,59,48,0.08);
+    border-color: rgba(255,59,48,0.12);
+  }
+
+  .key.key-del:hover {
+    background: rgba(255,59,48,0.15);
+  }
+
+  .key.key-del .key-num {
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: rgba(255,80,70,0.8);
+    letter-spacing: 0.05em;
+  }
+
+  .key.key-enter {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.14);
+  }
+
+  .key.key-enter:hover {
+    background: rgba(255,255,255,0.14);
+  }
+
+  .key.key-enter .key-num {
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── ATTEMPTS ── */
+  .attempts {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .attempt-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    transition: background 0.3s;
+  }
+
+  .attempt-dot.used { background: rgba(255,59,48,0.6); }
+
+  /* ── UNLOCK OVERLAY ── */
+  .unlock-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+  }
+
+  .unlock-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .unlock-text {
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    font-weight: 300;
+    margin-bottom: 48px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* ── REVEAL ── */
+  .reveal {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .reveal.show {
+    display: flex;
+    opacity: 1;
+  }
+
+  .reveal-img-wrap {
+    position: relative;
+    max-width: min(480px, 88vw);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.08),
+      0 40px 100px rgba(0,0,0,0.9);
+  }
+
+  .reveal-img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .reveal-caption {
+    margin-top: 24px;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.15);
+    font-weight: 300;
+  }
+
+  .reveal-back {
+    margin-top: 32px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    padding: 10px 24px;
+    color: rgba(255,255,255,0.4);
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    font-family: inherit;
+  }
+
+  .reveal-back:hover {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+  }
+
+  /* ── SCANLINE EFFECT ── */
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+  }
+
+  /* ── ERROR FLASH ── */
+  @keyframes errorFlash {
+    0%, 100% { background: transparent; }
+    20%, 60% { background: rgba(255,59,48,0.06); }
+  }
+
+  .error-flash { animation: errorFlash 0.5s ease; }
+
+  @keyframes successPulse {
+    0%, 100% { box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 120px rgba(255,255,255,0.02); }
+    50% { box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 60px rgba(48,209,88,0.15); }
+  }
+
+  .success-pulse { animation: successPulse 0.6s ease; }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="scanlines"></div>
+
+<!-- VAULT UI -->
+<div class="vault" id="vault">
+  <div class="vault-header">
+    <span class="vault-label">Octic</span>
+    <span class="vault-title">Restricted Access</span>
+  </div>
+
+  <div class="glass-panel" id="glassPanel">
+    <div class="display-wrap" id="displayWrap">
+      <span class="display-status" id="displayStatus">Enter Code</span>
+      <div class="display-code" id="displayCode">
+        <span class="cursor-blink" id="cursor"></span>
+      </div>
+    </div>
+
+    <div class="keypad">
+      <div class="key" onclick="pressKey('1')"><span class="key-num">1</span><span class="key-letters"></span></div>
+      <div class="key" onclick="pressKey('2')"><span class="key-num">2</span><span class="key-letters">abc</span></div>
+      <div class="key" onclick="pressKey('3')"><span class="key-num">3</span><span class="key-letters">def</span></div>
+      <div class="key" onclick="pressKey('4')"><span class="key-num">4</span><span class="key-letters">ghi</span></div>
+      <div class="key" onclick="pressKey('5')"><span class="key-num">5</span><span class="key-letters">jkl</span></div>
+      <div class="key" onclick="pressKey('6')"><span class="key-num">6</span><span class="key-letters">mno</span></div>
+      <div class="key" onclick="pressKey('7')"><span class="key-num">7</span><span class="key-letters">pqrs</span></div>
+      <div class="key" onclick="pressKey('8')"><span class="key-num">8</span><span class="key-letters">tuv</span></div>
+      <div class="key" onclick="pressKey('9')"><span class="key-num">9</span><span class="key-letters">wxyz</span></div>
+      <div class="key key-del" onclick="deleteLast()"><span class="key-num">⌫ Del</span></div>
+      <div class="key" onclick="pressKey('0')"><span class="key-num">0</span><span class="key-letters"></span></div>
+      <div class="key key-enter" onclick="submitCode()"><span class="key-num">Enter ↵</span></div>
+    </div>
+
+    <div class="attempts" id="attempts">
+      <div class="attempt-dot" id="dot0"></div>
+      <div class="attempt-dot" id="dot1"></div>
+      <div class="attempt-dot" id="dot2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- UNLOCK OVERLAY -->
+<div class="unlock-overlay" id="unlockOverlay">
+  <span class="unlock-text" id="unlockText">Authenticating...</span>
+</div>
+
+<!-- REVEAL -->
+<div class="reveal" id="reveal">
+  <div class="reveal-img-wrap">
+    <img src="" id="revealImg" alt="">
+  </div>
+  <span class="reveal-caption">Classified</span>
+  <button class="reveal-back" onclick="resetVault()">← Lock Again</button>
+</div>
+
+<script>
+  const PASSWORD = '8008135';
+  let input = '';
+  let attempts = 0;
+  const maxAttempts = 3;
+  let locked = false;
+
+  window.addEventListener('load', () => {
+    document.getElementById('vault').classList.add('loaded');
+  });
+
+  function updateDisplay() {
+    const code = document.getElementById('displayCode');
+    const cursor = document.getElementById('cursor');
+    code.innerHTML = '';
+    for (let i = 0; i < input.length; i++) {
+      const d = document.createElement('span');
+      d.className = 'digit';
+      d.textContent = '•';
+      code.appendChild(d);
+    }
+    code.appendChild(cursor);
+  }
+
+  function pressKey(num) {
+    if (locked) return;
+    if (input.length >= PASSWORD.length) return;
+
+    // Button press feedback
+    event.currentTarget.classList.add('pressed');
+    setTimeout(() => event.currentTarget.classList.remove('pressed'), 150);
+
+    // Sound
+    playTone(220 + parseInt(num) * 30, 80);
+
+    input += num;
+    updateDisplay();
+
+    if (input.length === PASSWORD.length) {
+      setTimeout(submitCode, 300);
+    }
+  }
+
+  function deleteLast() {
+    if (locked || input.length === 0) return;
+    playTone(180, 60);
+    input = input.slice(0, -1);
+    const code = document.getElementById('displayCode');
+    code.classList.remove('error', 'success');
+    document.getElementById('displayStatus').textContent = 'Enter Code';
+    updateDisplay();
+  }
+
+  function submitCode() {
+    if (locked || input.length === 0) return;
+
+    if (input === PASSWORD) {
+      unlockSequence();
+    } else {
+      wrongCode();
+    }
+  }
+
+  function wrongCode() {
+    attempts++;
+    playTone(100, 300);
+
+    const wrap = document.getElementById('displayWrap');
+    const code = document.getElementById('displayCode');
+    const status = document.getElementById('displayStatus');
+
+    code.classList.add('error');
+    status.textContent = 'Access Denied';
+    wrap.classList.add('shake');
+    document.body.classList.add('error-flash');
+
+    if (document.getElementById(`dot${attempts - 1}`)) {
+      document.getElementById(`dot${attempts - 1}`).classList.add('used');
+    }
+
+    setTimeout(() => {
+      wrap.classList.remove('shake');
+      document.body.classList.remove('error-flash');
+    }, 500);
+
+    if (attempts >= maxAttempts) {
+      locked = true;
+      status.textContent = 'System Locked';
+      input = '';
+      updateDisplay();
+
+      setTimeout(() => {
+        status.textContent = 'Try Again in 10s';
+        setTimeout(() => {
+          locked = false;
+          attempts = 0;
+          input = '';
+          code.classList.remove('error');
+          status.textContent = 'Enter Code';
+          updateDisplay();
+          document.querySelectorAll('.attempt-dot').forEach(d => d.classList.remove('used'));
+        }, 10000);
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        input = '';
+        code.classList.remove('error');
+        status.textContent = 'Enter Code';
+        updateDisplay();
+      }, 900);
+    }
+  }
+
+  function unlockSequence() {
+    locked = true;
+    playTone(440, 100);
+    setTimeout(() => playTone(550, 100), 120);
+    setTimeout(() => playTone(660, 200), 240);
+
+    const code = document.getElementById('displayCode');
+    const status = document.getElementById('displayStatus');
+    const panel = document.getElementById('glassPanel');
+
+    code.classList.add('success');
+    status.textContent = 'Access Granted';
+    panel.classList.add('success-pulse');
+
+    const overlay = document.getElementById('unlockOverlay');
+    const unlockText = document.getElementById('unlockText');
+
+    setTimeout(() => {
+      overlay.classList.add('show');
+    }, 600);
+
+    const messages = ['Authenticating...', 'Verifying credentials...', 'Decrypting vault...', 'Access granted.'];
+    let mi = 0;
+    const msgInterval = setInterval(() => {
+      mi++;
+      if (mi < messages.length) {
+        unlockText.textContent = messages[mi];
+      } else {
+        clearInterval(msgInterval);
+      }
+    }, 600);
+
+    setTimeout(() => {
+      overlay.classList.remove('show');
+      setTimeout(() => {
+        const reveal = document.getElementById('reveal');
+        document.getElementById('revealImg').src = 'images/a7x92k.jpg';
+        reveal.style.display = 'flex';
+        requestAnimationFrame(() => reveal.style.opacity = '1');
+      }, 800);
+    }, 2800);
+  }
+
+  function resetVault() {
+    const reveal = document.getElementById('reveal');
+    reveal.style.opacity = '0';
+    setTimeout(() => { reveal.style.display = 'none'; }, 600);
+    locked = false;
+    attempts = 0;
+    input = '';
+    document.getElementById('displayCode').classList.remove('error', 'success');
+    document.getElementById('displayStatus').textContent = 'Enter Code';
+    document.getElementById('glassPanel').classList.remove('success-pulse');
+    document.querySelectorAll('.attempt-dot').forEach(d => d.classList.remove('used'));
+    updateDisplay();
+  }
+
+  // Keyboard support
+  document.addEventListener('keydown', e => {
+    if (e.key >= '0' && e.key <= '9') pressKey(e.key);
+    if (e.key === 'Backspace') deleteLast();
+    if (e.key === 'Enter') submitCode();
+  });
+
+  // Web Audio tone feedback
+  let audioCtx;
+  function playTone(freq, duration) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration / 1000);
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + duration / 1000);
+    } catch(e) {}
+  }
+
+  updateDisplay();
+</script>
+
+</body>
+</html>
