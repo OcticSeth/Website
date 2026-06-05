@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Octic — Seth Pena | Automotive Photographer & Videographer | Austin, TX</title>
+<meta name="description" content="Octic is the automotive photography and videography brand of Seth Pena, based in Austin, Texas. Specializing in supercars, hypercars, and cinematic VHS-aesthetic content.">
+<meta property="og:title" content="Octic — Seth Pena | Automotive Photographer">
+<meta property="og:description" content="Cinematic automotive photography and videography based in Austin, TX.">
+<meta property="og:url" content="https://octicseth.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Helvetica+Neue:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+
+  html { cursor: none; }
+
+  html, body {
+    background: #000;
+    min-height: 100vh;
+    font-family: var(--sans);
+    overflow-x: hidden;
+  }
+
+  /* ── CUSTOM CURSOR ── */
+  .cursor {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+    mix-blend-mode: difference;
+  }
+
+  .cursor-ring {
+    position: fixed;
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.12s ease, width 0.4s ease, height 0.4s ease, opacity 0.3s ease, border-color 0.3s ease;
+  }
+
+  .cursor.expanded { width: 16px; height: 16px; }
+  .cursor-ring.expanded { width: 60px; height: 60px; border-color: rgba(255,255,255,0.2); }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    mix-blend-mode: difference;
+  }
+
+  .nav-logo {
+    text-decoration: none;
+    opacity: 0;
+    animation: fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+  }
+
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: none;
+    padding: 8px;
+    opacity: 0;
+    animation: fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+  }
+
+  .hamburger span {
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: #fff;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, width 0.4s ease;
+    transform-origin: center;
+  }
+
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ── MENU OVERLAY ── */
+  .menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 12vw;
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+
+  .menu-overlay.open {
+    clip-path: inset(0 0 0% 0);
+    pointer-events: all;
+  }
+
+  .menu-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 60px;
+  }
+
+  .menu-overlay > .menu-nav-links > a {
+    font-family: var(--serif);
+    color: #fff;
+    text-decoration: none;
+    font-size: clamp(52px, 9vw, 96px);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    display: inline-block;
+    overflow: hidden;
+    transition: color 0.3s ease;
+    position: relative;
+  }
+
+  .menu-overlay > .menu-nav-links > a::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #fff;
+    transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .menu-overlay > .menu-nav-links > a:hover::after { width: 100%; }
+  .menu-overlay > .menu-nav-links > a:hover { color: rgba(255,255,255,0.7); }
+
+  .menu-meta {
+    display: flex;
+    align-items: center;
+    gap: 48px;
+    border-top: 1px solid #1a1a1a;
+    padding-top: 32px;
+    width: 100%;
+  }
+
+  .menu-meta-text {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #444;
+  }
+
+  .menu-socials {
+    display: flex;
+    gap: 24px;
+    margin-left: auto;
+  }
+
+  .menu-socials a {
+    opacity: 0.3;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.3s ease;
+    cursor: none;
+  }
+
+  .menu-socials a:hover { opacity: 1; }
+  .menu-socials svg { width: 16px; height: 16px; }
+
+  /* ── MASONRY ── */
+  main { padding-top: 64px; }
+
+  .masonry {
+    columns: 2;
+    column-gap: 0;
+  }
+
+  .masonry-item {
+    break-inside: avoid;
+    cursor: none;
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .masonry-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: brightness(0.85) saturate(0.95);
+    transform: scale(1.04);
+    opacity: 0;
+    transition:
+      filter 0.6s ease,
+      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .masonry-item.revealed img {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .masonry-item:hover img {
+    filter: brightness(1) saturate(1.05);
+    transform: scale(1.02);
+  }
+
+  /* Image reveal animation */
+  .masonry-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #000;
+    z-index: 1;
+    transform: scaleY(1);
+    transform-origin: bottom;
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .masonry-item.revealed::before {
+    transform: scaleY(0);
+  }
+
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.98);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .lightbox.open {
+    display: flex;
+    opacity: 1;
+  }
+
+  .lightbox-media {
+    max-width: 88vw;
+    max-height: 90vh;
+    object-fit: contain;
+    pointer-events: none;
+    transform: scale(0.96);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .lightbox.open .lightbox-media { transform: scale(1); }
+
+  .lb-close {
+    position: fixed;
+    top: 20px; right: 28px;
+    color: #fff;
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 300;
+    font-style: italic;
+    cursor: none;
+    opacity: 0.3;
+    transition: opacity 0.3s;
+    line-height: 1;
+    user-select: none;
+    z-index: 101;
+    letter-spacing: -0.02em;
+  }
+
+  .lb-close:hover { opacity: 1; }
+
+  .lb-counter {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: #444;
+    text-transform: uppercase;
+    z-index: 101;
+  }
+
+  .lb-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 300;
+    font-style: italic;
+    cursor: none;
+    opacity: 0.2;
+    padding: 24px 20px;
+    transition: opacity 0.3s;
+    user-select: none;
+    z-index: 101;
+    letter-spacing: -0.02em;
+  }
+
+  .lb-arrow:hover { opacity: 0.9; }
+  .lb-prev { left: 0; }
+  .lb-next { right: 0; }
+
+  /* ── CONTACT POPUP ── */
+  .contact-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    backdrop-filter: blur(12px) brightness(0.4);
+    -webkit-backdrop-filter: blur(12px) brightness(0.4);
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .contact-backdrop.open {
+    display: flex;
+    opacity: 1;
+  }
+
+  .contact-popup {
+    background: #050505;
+    border: 1px solid #1c1c1c;
+    width: min(560px, 92vw);
+    padding: 52px 48px;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .contact-backdrop.open .contact-popup { transform: translateY(0); }
+
+  .contact-popup h2 {
+    font-family: var(--serif);
+    font-size: clamp(36px, 7vw, 56px);
+    font-weight: 300;
+    font-style: italic;
+    letter-spacing: -0.01em;
+    color: #fff;
+    margin-bottom: 44px;
+    line-height: 1;
+  }
+
+  .contact-body {
+    display: flex;
+    gap: 48px;
+  }
+
+  .contact-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .contact-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #444;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #1f1f1f;
+    color: #fff;
+    font-size: 13px;
+    font-family: var(--sans);
+    font-weight: 300;
+    padding: 8px 0;
+    outline: none;
+    transition: border-color 0.3s ease;
+    resize: none;
+  }
+
+  .contact-form input:focus,
+  .contact-form textarea:focus { border-bottom-color: #555; }
+
+  .contact-form textarea { height: 44px; }
+
+  .contact-submit {
+    margin-top: 8px;
+    background: transparent;
+    color: #fff;
+    border: 1px solid #2a2a2a;
+    padding: 14px 0;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: none;
+    width: 100%;
+    font-family: var(--sans);
+    font-weight: 300;
+    transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+  }
+
+  .contact-submit:hover {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+  }
+
+  .contact-info {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .contact-info-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .contact-info-block span {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #333;
+  }
+
+  .contact-info-block a,
+  .contact-info-block p {
+    color: #888;
+    font-size: 12px;
+    font-weight: 300;
+    text-decoration: none;
+    line-height: 1.5;
+    transition: color 0.2s;
+  }
+
+  .contact-info-block a:hover { color: #fff; }
+
+  .contact-info-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .contact-info-socials {
+    display: flex;
+    gap: 16px;
+    padding-top: 28px;
+    border-top: 1px solid #111;
+  }
+
+  .contact-info-socials a {
+    color: #fff;
+    opacity: 0.2;
+    transition: opacity 0.3s ease;
+    display: flex;
+    cursor: none;
+  }
+
+  .contact-info-socials a:hover { opacity: 1; }
+  .contact-info-socials svg { width: 14px; height: 14px; }
+
+  .contact-close {
+    position: absolute;
+    top: 20px; right: 24px;
+    color: #333;
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 300;
+    font-style: italic;
+    cursor: none;
+    line-height: 1;
+    transition: color 0.2s;
+    user-select: none;
+  }
+
+  .contact-close:hover { color: #fff; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .contact-body { flex-direction: column; }
+    .contact-info { width: 100%; }
+    .contact-popup { padding: 36px 24px; }
+    nav { padding: 0 16px; }
+  }
+
+  @media (max-width: 480px) {
+    .masonry { columns: 1; }
+    html { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a class="nav-logo" href="#">
+    <img src="images/Logo1.PNG" alt="Octic" style="height:52px;width:auto;display:block;filter:invert(0);">
+  </a>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</nav>
+
+<!-- MENU OVERLAY -->
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu-nav-links">
+    <a href="#" onclick="toggleMenu(); window.scrollTo({top:0, behavior:'smooth'});">Work</a>
+    <a href="#" onclick="openContact()">Contact</a>
+  </div>
+  <div class="menu-meta">
+    <span class="menu-meta-text">Austin, Texas</span>
+    <span class="menu-meta-text">© 2025 Octic</span>
+    <div class="menu-socials">
+      <a href="https://instagram.com/octicseth" target="_blank" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+        </svg>
+      </a>
+      <a href="https://www.youtube.com/channel/UC5leTVyPP1B9rX5C2dFYYsQ" target="_blank" aria-label="YouTube">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="3"/>
+          <polygon points="10,9 16,12 10,15" fill="currentColor" stroke="none"/>
+        </svg>
+      </a>
+      <a href="https://www.tiktok.com/@octicseth" target="_blank" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- MASONRY GRID -->
+<main>
+  <div class="masonry" id="masonry">
+    <div class="masonry-item"><img src="images/1.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/2.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/3.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/4.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/5.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/6.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/7.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/8.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/9.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/10.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/11.jpg" alt=""></div>
+    <div class="masonry-item"><img src="images/12.jpg" alt=""></div>
+    <div class="masonry-item"><img src="images/13.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/14.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/15.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/16.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/17.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/18.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/19.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/20.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/21.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/22.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/23.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/24.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/25.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/26.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/27.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/28.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/29.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/30.webp" alt=""></div>
+    <div class="masonry-item"><img src="images/31.webp" alt=""></div>
+  </div>
+</main>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="lbBgClose(event)">
+  <span class="lb-close" onclick="closeLb()">close</span>
+  <span class="lb-arrow lb-prev" onclick="lbNav(-1, event)">←</span>
+  <img class="lightbox-media" id="lbImg" src="" alt="">
+  <span class="lb-arrow lb-next" onclick="lbNav(1, event)">→</span>
+  <div class="lb-counter" id="lbCounter"></div>
+</div>
+
+<!-- CONTACT POPUP -->
+<div class="contact-backdrop" id="contactBackdrop" onclick="backdropClose(event)">
+  <div class="contact-popup">
+    <span class="contact-close" onclick="closeContact()">×</span>
+    <h2>Contact</h2>
+    <div class="contact-body">
+      <div class="contact-form">
+        <label>Full Name<input type="text"></label>
+        <label>E-mail<input type="email"></label>
+        <label>Message<textarea rows="2"></textarea></label>
+        <button class="contact-submit" onclick="submitContact()">Send</button>
+      </div>
+      <div class="contact-info">
+        <div class="contact-info-inner">
+          <div class="contact-info-block">
+            <span>Contact</span>
+            <a href="mailto:hi@octicseth.com">hi@octicseth.com</a>
+          </div>
+          <div class="contact-info-block">
+            <span>Based in</span>
+            <p>Austin, Texas</p>
+          </div>
+          <div class="contact-info-block">
+            <span>Photographer</span>
+            <p>Seth Pena</p>
+          </div>
+        </div>
+        <div class="contact-info-socials">
+          <a href="https://instagram.com/octicseth" target="_blank" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+            </svg>
+          </a>
+          <a href="https://www.youtube.com/channel/UC5leTVyPP1B9rX5C2dFYYsQ" target="_blank" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="3"/>
+              <polygon points="10,9 16,12 10,15" fill="currentColor" stroke="none"/>
+            </svg>
+          </a>
+          <a href="https://www.tiktok.com/@octicseth" target="_blank" aria-label="TikTok">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── CUSTOM CURSOR ──
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, .masonry-item, .hamburger, .lb-close, .lb-arrow, .contact-close').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.classList.add('expanded'); ring.classList.add('expanded'); });
+    el.addEventListener('mouseleave', () => { cursor.classList.remove('expanded'); ring.classList.remove('expanded'); });
+  });
+
+  // ── NAV HIDE/SHOW ──
+  let lastScroll = 0;
+  window.addEventListener('scroll', () => {
+    const current = window.scrollY;
+    const nav = document.getElementById('nav');
+    if (current <= 10) {
+      nav.style.transform = 'translateY(0)';
+    } else if (current > lastScroll) {
+      nav.style.transform = 'translateY(-100%)';
+    } else {
+      nav.style.transform = 'translateY(0)';
+    }
+    lastScroll = current;
+  });
+
+  // ── SCROLL REVEAL ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('revealed'), i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.masonry-item').forEach(el => observer.observe(el));
+
+  // ── MENU ──
+  let menuOpen = false;
+  function toggleMenu() {
+    menuOpen = !menuOpen;
+    document.getElementById('menuOverlay').classList.toggle('open', menuOpen);
+    document.getElementById('hamburger').classList.toggle('open', menuOpen);
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+  }
+
+  // ── LIGHTBOX ──
+  let lbIndex = 0;
+  function getItems() { return [...document.querySelectorAll('.masonry-item')]; }
+
+  function openLb(index) {
+    lbIndex = index;
+    const items = getItems();
+    const lb = document.getElementById('lightbox');
+    document.getElementById('lbImg').src = items[lbIndex].querySelector('img').src;
+    document.getElementById('lbCounter').textContent = `${lbIndex + 1} / ${items.length}`;
+    lb.style.display = 'flex';
+    requestAnimationFrame(() => lb.style.opacity = '1');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLb() {
+    const lb = document.getElementById('lightbox');
+    lb.style.opacity = '0';
+    setTimeout(() => { lb.style.display = 'none'; }, 400);
+    document.body.style.overflow = '';
+  }
+
+  function lbBgClose(e) {
+    if (e.target === document.getElementById('lightbox')) closeLb();
+  }
+
+  function lbNav(dir, e) {
+    if (e) e.stopPropagation();
+    const items = getItems();
+    lbIndex = (lbIndex + dir + items.length) % items.length;
+    const img = document.getElementById('lbImg');
+    img.style.opacity = '0';
+    setTimeout(() => {
+      img.src = items[lbIndex].querySelector('img').src;
+      img.style.opacity = '1';
+      document.getElementById('lbCounter').textContent = `${lbIndex + 1} / ${items.length}`;
+    }, 200);
+  }
+
+  document.getElementById('lbImg').style.transition = 'opacity 0.2s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1)';
+
+  document.addEventListener('keydown', e => {
+    const lbOpen = document.getElementById('lightbox').style.display === 'flex';
+    const cOpen = document.getElementById('contactBackdrop').classList.contains('open');
+    if (e.key === 'Escape') { if (lbOpen) closeLb(); if (cOpen) closeContact(); }
+    if (lbOpen && e.key === 'ArrowLeft') lbNav(-1);
+    if (lbOpen && e.key === 'ArrowRight') lbNav(1);
+  });
+
+  // ── CONTACT POPUP ──
+  function openContact() {
+    if (menuOpen) toggleMenu();
+    const bd = document.getElementById('contactBackdrop');
+    bd.style.display = 'flex';
+    requestAnimationFrame(() => bd.classList.add('open'));
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeContact() {
+    const bd = document.getElementById('contactBackdrop');
+    bd.classList.remove('open');
+    setTimeout(() => { bd.style.display = 'none'; }, 500);
+    document.body.style.overflow = '';
+  }
+
+  function backdropClose(e) {
+    if (e.target === document.getElementById('contactBackdrop')) closeContact();
+  }
+
+  async function submitContact() {
+    const btn = document.querySelector('.contact-submit');
+    const name = document.querySelector('.contact-form input[type="text"]').value;
+    const email = document.querySelector('.contact-form input[type="email"]').value;
+    const message = document.querySelector('.contact-form textarea').value;
+
+    if (!name || !email || !message) {
+      btn.textContent = 'Fill all fields';
+      setTimeout(() => btn.textContent = 'Send', 2000);
+      return;
+    }
+
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('https://formspree.io/f/mkoawjvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ name, email, message })
+      });
+
+      if (res.ok) {
+        btn.textContent = 'Sent ✓';
+        document.querySelector('.contact-form input[type="text"]').value = '';
+        document.querySelector('.contact-form input[type="email"]').value = '';
+        document.querySelector('.contact-form textarea').value = '';
+        setTimeout(() => { btn.textContent = 'Send'; btn.disabled = false; }, 3000);
+      } else {
+        btn.textContent = 'Error — try again';
+        btn.disabled = false;
+      }
+    } catch {
+      btn.textContent = 'Error — try again';
+      btn.disabled = false;
+    }
+  }
+
+  // Wire grid clicks
+  getItems().forEach((item, i) => item.addEventListener('click', () => openLb(i)));
+</script>
+
+</body>
+</html>
