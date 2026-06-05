@@ -9,189 +9,196 @@
 <meta property="og:description" content="Cinematic automotive photography and videography based in Austin, TX.">
 <meta property="og:url" content="https://octicseth.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Helvetica+Neue:wght@200;300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-  :root {
-    --serif: 'Cormorant Garamond', Georgia, serif;
-    --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  }
-
-  html { cursor: none; }
 
   html, body {
     background: #000;
     min-height: 100vh;
-    font-family: var(--sans);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* ── CUSTOM CURSOR ── */
-  .cursor {
-    position: fixed;
-    width: 8px;
-    height: 8px;
-    background: #fff;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
-    mix-blend-mode: difference;
+  /* ── LIQUID GLASS MIXIN ── */
+  .glass {
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow:
+      0 0 0 0.5px rgba(255,255,255,0.06) inset,
+      0 8px 32px rgba(0,0,0,0.4),
+      0 1px 0 rgba(255,255,255,0.1) inset;
   }
-
-  .cursor-ring {
-    position: fixed;
-    width: 36px;
-    height: 36px;
-    border: 1px solid rgba(255,255,255,0.4);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transform: translate(-50%, -50%);
-    transition: transform 0.12s ease, width 0.4s ease, height 0.4s ease, opacity 0.3s ease, border-color 0.3s ease;
-  }
-
-  .cursor.expanded { width: 16px; height: 16px; }
-  .cursor-ring.expanded { width: 60px; height: 60px; border-color: rgba(255,255,255,0.2); }
 
   /* ── NAV ── */
   nav {
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 50;
-    height: 64px;
+    width: min(680px, calc(100vw - 32px));
+    height: 52px;
+    border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 28px;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    mix-blend-mode: difference;
+    padding: 0 20px 0 14px;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), top 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+    background: rgba(20,20,20,0.55);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow:
+      0 0 0 0.5px rgba(255,255,255,0.05) inset,
+      0 2px 0 rgba(255,255,255,0.08) inset,
+      0 16px 48px rgba(0,0,0,0.6),
+      0 4px 16px rgba(0,0,0,0.4);
+  }
+
+  nav.hidden {
+    top: -80px;
+    opacity: 0;
   }
 
   .nav-logo {
     text-decoration: none;
-    opacity: 0;
-    animation: fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    display: flex;
+    align-items: center;
   }
 
   .hamburger {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    cursor: none;
+    gap: 5px;
+    cursor: pointer;
     padding: 8px;
-    opacity: 0;
-    animation: fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+    border-radius: 50%;
+    transition: background 0.2s;
+  }
+
+  .hamburger:hover {
+    background: rgba(255,255,255,0.08);
   }
 
   .hamburger span {
     display: block;
-    width: 24px;
-    height: 1px;
-    background: #fff;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, width 0.4s ease;
+    width: 20px;
+    height: 1.5px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 2px;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, width 0.3s ease;
     transform-origin: center;
   }
 
-  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
   .hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
-  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
   /* ── MENU OVERLAY ── */
   .menu-overlay {
     position: fixed;
     inset: 0;
-    background: #000;
     z-index: 40;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    padding: 0 12vw;
-    clip-path: inset(0 0 100% 0);
-    transition: clip-path 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    gap: 0;
     pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
   }
 
   .menu-overlay.open {
-    clip-path: inset(0 0 0% 0);
+    opacity: 1;
     pointer-events: all;
   }
 
-  .menu-nav-links {
+  .menu-glass-card {
+    background: rgba(28,28,28,0.75);
+    backdrop-filter: blur(48px) saturate(200%);
+    -webkit-backdrop-filter: blur(48px) saturate(200%);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow:
+      0 0 0 0.5px rgba(255,255,255,0.06) inset,
+      0 2px 0 rgba(255,255,255,0.1) inset,
+      0 32px 80px rgba(0,0,0,0.7);
+    border-radius: 28px;
+    padding: 48px 56px;
     display: flex;
     flex-direction: column;
-    gap: 0;
-    margin-bottom: 60px;
-  }
-
-  .menu-overlay > .menu-nav-links > a {
-    font-family: var(--serif);
-    color: #fff;
-    text-decoration: none;
-    font-size: clamp(52px, 9vw, 96px);
-    font-weight: 300;
-    line-height: 1.1;
-    letter-spacing: -0.01em;
-    display: inline-block;
-    overflow: hidden;
-    transition: color 0.3s ease;
-    position: relative;
-  }
-
-  .menu-overlay > .menu-nav-links > a::after {
-    content: '';
-    position: absolute;
-    bottom: 4px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #fff;
-    transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .menu-overlay > .menu-nav-links > a:hover::after { width: 100%; }
-  .menu-overlay > .menu-nav-links > a:hover { color: rgba(255,255,255,0.7); }
-
-  .menu-meta {
-    display: flex;
     align-items: center;
-    gap: 48px;
-    border-top: 1px solid #1a1a1a;
-    padding-top: 32px;
-    width: 100%;
+    gap: 8px;
+    min-width: 320px;
+    transform: scale(0.94) translateY(16px);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .menu-meta-text {
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: #444;
+  .menu-overlay.open .menu-glass-card {
+    transform: scale(1) translateY(0);
+  }
+
+  .menu-glass-card a {
+    color: rgba(255,255,255,0.9);
+    text-decoration: none;
+    font-size: 38px;
+    font-weight: 200;
+    letter-spacing: -0.02em;
+    padding: 6px 0;
+    transition: color 0.2s ease;
+    width: 100%;
+    text-align: center;
+  }
+
+  .menu-glass-card a:hover { color: #fff; }
+
+  .menu-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 16px 0;
   }
 
   .menu-socials {
     display: flex;
-    gap: 24px;
-    margin-left: auto;
+    gap: 20px;
+    margin-top: 4px;
   }
 
   .menu-socials a {
-    opacity: 0.3;
-    color: #fff;
-    display: flex;
+    font-size: unset !important;
+    font-weight: unset !important;
+    letter-spacing: unset !important;
+    width: 40px !important;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex !important;
     align-items: center;
-    transition: opacity 0.3s ease;
-    cursor: none;
+    justify-content: center;
+    color: rgba(255,255,255,0.6) !important;
+    transition: background 0.2s, color 0.2s !important;
+    padding: 0 !important;
+    text-align: unset !important;
   }
 
-  .menu-socials a:hover { opacity: 1; }
+  .menu-socials a:hover {
+    background: rgba(255,255,255,0.14) !important;
+    color: #fff !important;
+  }
+
   .menu-socials svg { width: 16px; height: 16px; }
 
   /* ── MASONRY ── */
-  main { padding-top: 64px; }
+  main { padding-top: 84px; }
 
   .masonry {
     columns: 2;
@@ -200,7 +207,7 @@
 
   .masonry-item {
     break-inside: avoid;
-    cursor: none;
+    cursor: pointer;
     display: block;
     position: relative;
     overflow: hidden;
@@ -210,38 +217,21 @@
     width: 100%;
     height: auto;
     display: block;
-    filter: brightness(0.85) saturate(0.95);
-    transform: scale(1.04);
+    filter: brightness(0.88);
+    transition: filter 0.5s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     opacity: 0;
-    transition:
-      filter 0.6s ease,
-      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(1.03);
   }
 
   .masonry-item.revealed img {
     opacity: 1;
     transform: scale(1);
+    transition: opacity 0.8s ease, filter 0.5s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .masonry-item:hover img {
-    filter: brightness(1) saturate(1.05);
-    transform: scale(1.02);
-  }
-
-  /* Image reveal animation */
-  .masonry-item::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: #000;
-    z-index: 1;
-    transform: scaleY(1);
-    transform-origin: bottom;
-    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .masonry-item.revealed::before {
-    transform: scaleY(0);
+    filter: brightness(1.0);
+    transform: scale(1.015);
   }
 
   /* ── LIGHTBOX ── */
@@ -249,12 +239,14 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.98);
     z-index: 100;
     align-items: center;
     justify-content: center;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.35s ease;
   }
 
   .lightbox.open {
@@ -264,65 +256,75 @@
 
   .lightbox-media {
     max-width: 88vw;
-    max-height: 90vh;
+    max-height: 88vh;
     object-fit: contain;
     pointer-events: none;
-    transform: scale(0.96);
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 4px;
   }
 
-  .lightbox.open .lightbox-media { transform: scale(1); }
-
-  .lb-close {
+  .lb-ui {
     position: fixed;
-    top: 20px; right: 28px;
-    color: #fff;
-    font-family: var(--serif);
-    font-size: 36px;
-    font-weight: 300;
-    font-style: italic;
-    cursor: none;
-    opacity: 0.3;
-    transition: opacity 0.3s;
-    line-height: 1;
-    user-select: none;
-    z-index: 101;
-    letter-spacing: -0.02em;
-  }
-
-  .lb-close:hover { opacity: 1; }
-
-  .lb-counter {
-    position: fixed;
-    bottom: 24px;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 10px;
-    letter-spacing: 0.25em;
-    color: #444;
-    text-transform: uppercase;
     z-index: 101;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(20,20,20,0.6);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    padding: 8px 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+
+  .lb-counter {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.5);
+    font-weight: 300;
+  }
+
+  .lb-close-btn {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    font-weight: 400;
+    transition: color 0.2s;
+    border: none;
+    background: none;
+    font-family: inherit;
+    padding: 0;
+  }
+
+  .lb-close-btn:hover { color: #fff; }
+
+  .lb-dot {
+    width: 3px;
+    height: 3px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
   }
 
   .lb-arrow {
     position: fixed;
     top: 50%;
     transform: translateY(-50%);
-    color: #fff;
-    font-family: var(--serif);
-    font-size: 28px;
-    font-weight: 300;
-    font-style: italic;
-    cursor: none;
-    opacity: 0.2;
+    color: rgba(255,255,255,0.35);
+    font-size: 20px;
+    font-weight: 200;
+    cursor: pointer;
     padding: 24px 20px;
-    transition: opacity 0.3s;
+    transition: color 0.2s;
     user-select: none;
     z-index: 101;
-    letter-spacing: -0.02em;
   }
 
-  .lb-arrow:hover { opacity: 0.9; }
+  .lb-arrow:hover { color: #fff; }
   .lb-prev { left: 0; }
   .lb-next { right: 0; }
 
@@ -332,12 +334,13 @@
     position: fixed;
     inset: 0;
     z-index: 200;
-    backdrop-filter: blur(12px) brightness(0.4);
-    -webkit-backdrop-filter: blur(12px) brightness(0.4);
     align-items: center;
     justify-content: center;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
     opacity: 0;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.4s ease;
   }
 
   .contact-backdrop.open {
@@ -346,115 +349,126 @@
   }
 
   .contact-popup {
-    background: #050505;
-    border: 1px solid #1c1c1c;
+    background: rgba(18,18,18,0.85);
+    backdrop-filter: blur(56px) saturate(200%);
+    -webkit-backdrop-filter: blur(56px) saturate(200%);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow:
+      0 0 0 0.5px rgba(255,255,255,0.05) inset,
+      0 2px 0 rgba(255,255,255,0.09) inset,
+      0 40px 100px rgba(0,0,0,0.8);
+    border-radius: 28px;
     width: min(560px, 92vw);
-    padding: 52px 48px;
+    padding: 44px 44px 40px;
     position: relative;
-    transform: translateY(20px);
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(0.95) translateY(20px);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .contact-backdrop.open .contact-popup { transform: translateY(0); }
+  .contact-backdrop.open .contact-popup {
+    transform: scale(1) translateY(0);
+  }
 
   .contact-popup h2 {
-    font-family: var(--serif);
-    font-size: clamp(36px, 7vw, 56px);
+    font-size: 28px;
     font-weight: 300;
-    font-style: italic;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.03em;
     color: #fff;
-    margin-bottom: 44px;
-    line-height: 1;
+    margin-bottom: 32px;
   }
 
   .contact-body {
     display: flex;
-    gap: 48px;
+    gap: 40px;
   }
 
   .contact-form {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 20px;
   }
 
   .contact-form label {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    font-size: 9px;
-    letter-spacing: 0.22em;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #444;
+    color: rgba(255,255,255,0.3);
+    font-weight: 400;
   }
 
   .contact-form input,
   .contact-form textarea {
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid #1f1f1f;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
     color: #fff;
-    font-size: 13px;
-    font-family: var(--sans);
+    font-size: 14px;
+    font-family: inherit;
     font-weight: 300;
-    padding: 8px 0;
+    padding: 10px 14px;
     outline: none;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.2s, background 0.2s;
     resize: none;
   }
 
   .contact-form input:focus,
-  .contact-form textarea:focus { border-bottom-color: #555; }
+  .contact-form textarea:focus {
+    border-color: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.08);
+  }
 
-  .contact-form textarea { height: 44px; }
+  .contact-form textarea { height: 72px; }
 
   .contact-submit {
-    margin-top: 8px;
-    background: transparent;
-    color: #fff;
-    border: 1px solid #2a2a2a;
-    padding: 14px 0;
-    font-size: 9px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    cursor: none;
+    background: rgba(255,255,255,0.9);
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 0;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    cursor: pointer;
     width: 100%;
-    font-family: var(--sans);
-    font-weight: 300;
-    transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+    font-family: inherit;
+    transition: background 0.2s, transform 0.15s;
   }
 
   .contact-submit:hover {
     background: #fff;
-    color: #000;
-    border-color: #fff;
+    transform: scale(1.01);
   }
 
+  .contact-submit:active { transform: scale(0.99); }
+
   .contact-info {
-    width: 150px;
+    width: 148px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 24px;
   }
 
   .contact-info-block {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
 
   .contact-info-block span {
     font-size: 9px;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: #333;
+    color: rgba(255,255,255,0.25);
+    font-weight: 400;
   }
 
   .contact-info-block a,
   .contact-info-block p {
-    color: #888;
+    color: rgba(255,255,255,0.6);
     font-size: 12px;
     font-weight: 300;
     text-decoration: none;
@@ -464,76 +478,78 @@
 
   .contact-info-block a:hover { color: #fff; }
 
-  .contact-info-inner {
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-  }
-
   .contact-info-socials {
     display: flex;
-    gap: 16px;
-    padding-top: 28px;
-    border-top: 1px solid #111;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
   }
 
   .contact-info-socials a {
-    color: #fff;
-    opacity: 0.2;
-    transition: opacity 0.3s ease;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.09);
     display: flex;
-    cursor: none;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.5);
+    transition: background 0.2s, color 0.2s;
   }
 
-  .contact-info-socials a:hover { opacity: 1; }
-  .contact-info-socials svg { width: 14px; height: 14px; }
+  .contact-info-socials a:hover {
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+  }
+
+  .contact-info-socials svg { width: 13px; height: 13px; }
 
   .contact-close {
     position: absolute;
-    top: 20px; right: 24px;
-    color: #333;
-    font-family: var(--serif);
-    font-size: 28px;
+    top: 16px; right: 18px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 16px;
     font-weight: 300;
-    font-style: italic;
-    cursor: none;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
     line-height: 1;
-    transition: color 0.2s;
     user-select: none;
   }
 
-  .contact-close:hover { color: #fff; }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
+  .contact-close:hover {
+    background: rgba(255,255,255,0.16);
+    color: #fff;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 580px) {
     .contact-body { flex-direction: column; }
     .contact-info { width: 100%; }
-    .contact-popup { padding: 36px 24px; }
-    nav { padding: 0 16px; }
+    .contact-popup { padding: 36px 24px 28px; border-radius: 20px; }
+    .menu-glass-card { padding: 36px 36px; min-width: 280px; }
+    .menu-glass-card a { font-size: 30px; }
   }
 
   @media (max-width: 480px) {
     .masonry { columns: 1; }
-    html { cursor: auto; }
-    .cursor, .cursor-ring { display: none; }
   }
 </style>
 </head>
 <body>
 
-<!-- CUSTOM CURSOR -->
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-
 <!-- NAV -->
 <nav id="nav">
   <a class="nav-logo" href="#">
-    <img src="images/Logo1.PNG" alt="Octic" style="height:52px;width:auto;display:block;filter:invert(0);">
+    <img src="images/Logo1.PNG" alt="Octic" style="height:44px;width:auto;display:block;">
   </a>
   <div class="hamburger" id="hamburger" onclick="toggleMenu()">
     <span></span>
@@ -544,13 +560,10 @@
 
 <!-- MENU OVERLAY -->
 <div class="menu-overlay" id="menuOverlay">
-  <div class="menu-nav-links">
+  <div class="menu-glass-card">
     <a href="#" onclick="toggleMenu(); window.scrollTo({top:0, behavior:'smooth'});">Work</a>
     <a href="#" onclick="openContact()">Contact</a>
-  </div>
-  <div class="menu-meta">
-    <span class="menu-meta-text">Austin, Texas</span>
-    <span class="menu-meta-text">© 2025 Octic</span>
+    <div class="menu-divider"></div>
     <div class="menu-socials">
       <a href="https://instagram.com/octicseth" target="_blank" aria-label="Instagram">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -613,11 +626,14 @@
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="lbBgClose(event)">
-  <span class="lb-close" onclick="closeLb()">close</span>
+  <div class="lb-ui">
+    <button class="lb-close-btn" onclick="closeLb()">Close</button>
+    <div class="lb-dot"></div>
+    <span class="lb-counter" id="lbCounter"></span>
+  </div>
   <span class="lb-arrow lb-prev" onclick="lbNav(-1, event)">←</span>
   <img class="lightbox-media" id="lbImg" src="" alt="">
   <span class="lb-arrow lb-next" onclick="lbNav(1, event)">→</span>
-  <div class="lb-counter" id="lbCounter"></div>
 </div>
 
 <!-- CONTACT POPUP -->
@@ -630,22 +646,20 @@
         <label>Full Name<input type="text"></label>
         <label>E-mail<input type="email"></label>
         <label>Message<textarea rows="2"></textarea></label>
-        <button class="contact-submit" onclick="submitContact()">Send</button>
+        <button class="contact-submit" onclick="submitContact()">Send Message</button>
       </div>
       <div class="contact-info">
-        <div class="contact-info-inner">
-          <div class="contact-info-block">
-            <span>Contact</span>
-            <a href="mailto:hi@octicseth.com">hi@octicseth.com</a>
-          </div>
-          <div class="contact-info-block">
-            <span>Based in</span>
-            <p>Austin, Texas</p>
-          </div>
-          <div class="contact-info-block">
-            <span>Photographer</span>
-            <p>Seth Pena</p>
-          </div>
+        <div class="contact-info-block">
+          <span>Email</span>
+          <a href="mailto:hi@octicseth.com">hi@octicseth.com</a>
+        </div>
+        <div class="contact-info-block">
+          <span>Based in</span>
+          <p>Austin, Texas</p>
+        </div>
+        <div class="contact-info-block">
+          <span>Photographer</span>
+          <p>Seth Pena</p>
         </div>
         <div class="contact-info-socials">
           <a href="https://instagram.com/octicseth" target="_blank" aria-label="Instagram">
@@ -673,55 +687,30 @@
 </div>
 
 <script>
-  // ── CUSTOM CURSOR ──
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursorRing');
-  let mx = 0, my = 0, rx = 0, ry = 0;
-
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    cursor.style.left = mx + 'px';
-    cursor.style.top = my + 'px';
-  });
-
-  function animateRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top = ry + 'px';
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-
-  document.querySelectorAll('a, button, .masonry-item, .hamburger, .lb-close, .lb-arrow, .contact-close').forEach(el => {
-    el.addEventListener('mouseenter', () => { cursor.classList.add('expanded'); ring.classList.add('expanded'); });
-    el.addEventListener('mouseleave', () => { cursor.classList.remove('expanded'); ring.classList.remove('expanded'); });
-  });
-
   // ── NAV HIDE/SHOW ──
   let lastScroll = 0;
   window.addEventListener('scroll', () => {
     const current = window.scrollY;
     const nav = document.getElementById('nav');
     if (current <= 10) {
-      nav.style.transform = 'translateY(0)';
-    } else if (current > lastScroll) {
-      nav.style.transform = 'translateY(-100%)';
-    } else {
-      nav.style.transform = 'translateY(0)';
+      nav.classList.remove('hidden');
+    } else if (current > lastScroll + 4) {
+      nav.classList.add('hidden');
+    } else if (current < lastScroll - 4) {
+      nav.classList.remove('hidden');
     }
     lastScroll = current;
   });
 
   // ── SCROLL REVEAL ──
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
+    entries.forEach(entry => {
       if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('revealed'), i * 60);
+        entry.target.classList.add('revealed');
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.08 });
+  }, { threshold: 0.06 });
 
   document.querySelectorAll('.masonry-item').forEach(el => observer.observe(el));
 
@@ -745,14 +734,14 @@
     document.getElementById('lbImg').src = items[lbIndex].querySelector('img').src;
     document.getElementById('lbCounter').textContent = `${lbIndex + 1} / ${items.length}`;
     lb.style.display = 'flex';
-    requestAnimationFrame(() => lb.style.opacity = '1');
+    requestAnimationFrame(() => lb.classList.add('open'));
     document.body.style.overflow = 'hidden';
   }
 
   function closeLb() {
     const lb = document.getElementById('lightbox');
-    lb.style.opacity = '0';
-    setTimeout(() => { lb.style.display = 'none'; }, 400);
+    lb.classList.remove('open');
+    setTimeout(() => { lb.style.display = 'none'; }, 350);
     document.body.style.overflow = '';
   }
 
@@ -770,20 +759,20 @@
       img.src = items[lbIndex].querySelector('img').src;
       img.style.opacity = '1';
       document.getElementById('lbCounter').textContent = `${lbIndex + 1} / ${items.length}`;
-    }, 200);
+    }, 180);
   }
 
-  document.getElementById('lbImg').style.transition = 'opacity 0.2s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1)';
+  document.getElementById('lbImg').style.transition = 'opacity 0.18s ease';
 
   document.addEventListener('keydown', e => {
-    const lbOpen = document.getElementById('lightbox').style.display === 'flex';
+    const lbOpen = document.getElementById('lightbox').classList.contains('open');
     const cOpen = document.getElementById('contactBackdrop').classList.contains('open');
     if (e.key === 'Escape') { if (lbOpen) closeLb(); if (cOpen) closeContact(); }
     if (lbOpen && e.key === 'ArrowLeft') lbNav(-1);
     if (lbOpen && e.key === 'ArrowRight') lbNav(1);
   });
 
-  // ── CONTACT POPUP ──
+  // ── CONTACT ──
   function openContact() {
     if (menuOpen) toggleMenu();
     const bd = document.getElementById('contactBackdrop');
@@ -795,7 +784,7 @@
   function closeContact() {
     const bd = document.getElementById('contactBackdrop');
     bd.classList.remove('open');
-    setTimeout(() => { bd.style.display = 'none'; }, 500);
+    setTimeout(() => { bd.style.display = 'none'; }, 400);
     document.body.style.overflow = '';
   }
 
@@ -811,7 +800,7 @@
 
     if (!name || !email || !message) {
       btn.textContent = 'Fill all fields';
-      setTimeout(() => btn.textContent = 'Send', 2000);
+      setTimeout(() => btn.textContent = 'Send Message', 2000);
       return;
     }
 
@@ -830,7 +819,7 @@
         document.querySelector('.contact-form input[type="text"]').value = '';
         document.querySelector('.contact-form input[type="email"]').value = '';
         document.querySelector('.contact-form textarea').value = '';
-        setTimeout(() => { btn.textContent = 'Send'; btn.disabled = false; }, 3000);
+        setTimeout(() => { btn.textContent = 'Send Message'; btn.disabled = false; }, 3000);
       } else {
         btn.textContent = 'Error — try again';
         btn.disabled = false;
